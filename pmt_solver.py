@@ -1,4 +1,4 @@
-
+from decimal import *
 
 
 
@@ -16,6 +16,7 @@ class Loan(object):
         # self.initial_guess = (self.beginning_value / self.periods) * (1 + self.interest_rate) * 1.5
         self.min_payment = (beginning_value - future_value) / periods
         self.max_payment = beginning_value * ((1 + interest_rate) ** periods)
+        self.payment_history = []
 
     def pmt(self):
 
@@ -37,6 +38,7 @@ class Loan(object):
 
     def solve(self, starting_values):
         this_pmt = starting_values[2]
+        self.payment_history.append(this_pmt)
         loan_schedule = [starting_values]
 
         # iteration_values = starting_values
@@ -51,19 +53,23 @@ class Loan(object):
         else:
             if loan_schedule[self.periods-1][3] < 1:
                 ''' ending balance negative, pmt lower '''
-                next_pmt = this_pmt / 2
+                next_pmt = max(self.min_payment, this_pmt / 2)
                 values = self.set_initial_values(next_pmt)
                 self.solve(values)
             else:
                 ''' ending balance positive, pmt higher '''
-                next_pmt = this_pmt * 2
+                next_pmt = (this_pmt + self.payment_history[-2]) / 2
                 values = self.set_initial_values(next_pmt)
                 self.solve(values)
 
 
     def next_period(self, period, period_values):
-        print ("%s\t%s\t\t\t%s\t\t%s\t\t%s" % (period+1, period_values[0], period_values[1],
-                                           period_values[2], period_values[3]))
+        beginning_value = Decimal(period_values[0]).quantize(Decimal('.01'), rounding=ROUND_UP)
+        interest_paid = Decimal(period_values[1]).quantize(Decimal('.01'), rounding=ROUND_UP)
+        payment = Decimal(period_values[2]).quantize(Decimal('.01'), rounding=ROUND_UP)
+        ending_value = Decimal(period_values[3]).quantize(Decimal('.01'), rounding=ROUND_UP)
+        print ("%s\t%s\t\t\t%s\t\t%s\t\t%s" % (period+1, beginning_value, interest_paid,
+                                           payment, ending_value))
         next_period = [
             period_values[3],
             period_values[3] * self.interest_rate,
