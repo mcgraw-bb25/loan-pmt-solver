@@ -13,7 +13,9 @@ class Loan(object):
         self.interest_rate = interest_rate
         self.periods = periods
         self.future_value = future_value
-        self.initial_guess = (self.beginning_value / self.periods) * (1 + self.interest_rate) * 1.5
+        # self.initial_guess = (self.beginning_value / self.periods) * (1 + self.interest_rate) * 1.5
+        self.min_payment = (beginning_value - future_value) / periods
+        self.max_payment = beginning_value * ((1 + interest_rate) ** periods)
 
     def pmt(self):
 
@@ -23,7 +25,7 @@ class Loan(object):
 
     def set_initial_values(self, payment=None):
         if not payment:
-            payment = self.initial_guess
+            payment = self.max_payment
         start_val = self.beginning_value
         start_interest = self.beginning_value * self.interest_rate
         pmt = payment
