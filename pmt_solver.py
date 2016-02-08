@@ -20,14 +20,15 @@ class Loan(object):
         self.recent_max = 0.0
         self.iterations = 0
         self.payment_history = []
+        self.solved_payment = 0.0
 
     def pmt(self):
         ''' main api call to solve for a payment '''
-        print ("Period\tBeginning Value\t\tInterest\tPayment\t\tEnding")
+        # print ("Period\tBeginning Value\t\tInterest\tPayment\t\tEnding")
         values = self.set_initial_values()
-        solved_payment = self.solve(values)
-        print ("Total iterations: %s" % (self.iterations))
-        return solved_payment
+        self.solve(values)
+        print ("Payment: %s\tTotal iterations: %s" % (self.solved_payment, self.iterations))
+        return self.solved_payment
 
     def set_initial_values(self, payment=None):
         if not payment:
@@ -67,8 +68,10 @@ class Loan(object):
                 values = self.set_initial_values(next_pmt)
                 self.solve(values)
         else:
-            print ("Solution found! Periodic Payment: %s" % (this_pmt))
-            return this_pmt
+            solved_payment = Decimal(this_pmt).quantize(Decimal('.01'), rounding=ROUND_UP)
+            print ("Solution found! Periodic Payment: %s" % (solved_payment))
+            self.solved_payment = float(solved_payment)
+            return solved_payment
 
     def next_period(self, period, period_values):
         beginning_value = Decimal(period_values[0]).quantize(Decimal('.01'), rounding=ROUND_UP)
@@ -90,6 +93,6 @@ if __name__ == "__main__":
 
     start = time.time()
     new_loan = Loan(100000,0,0.08,10)
-    new_loan.pmt()
+    a = new_loan.pmt()
     stop = time.time() - start
     print(stop)
