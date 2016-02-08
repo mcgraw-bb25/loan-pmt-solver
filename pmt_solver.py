@@ -75,8 +75,8 @@ class Loan(object):
         interest_paid = Decimal(period_values[1]).quantize(Decimal('.01'), rounding=ROUND_UP)
         payment = Decimal(period_values[2]).quantize(Decimal('.01'), rounding=ROUND_UP)
         ending_value = Decimal(period_values[3]).quantize(Decimal('.01'), rounding=ROUND_UP)
-        print ("%s\t%s\t\t\t%s\t\t%s\t\t%s" % (period+1, beginning_value, interest_paid,
-                                           payment, ending_value))
+        # print ("%s\t%s\t\t\t%s\t\t%s\t\t%s" % (period+1, beginning_value, interest_paid,
+        #                                    payment, ending_value))
         next_period = [
             period_values[3],
             period_values[3] * self.interest_rate,
