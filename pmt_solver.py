@@ -1,3 +1,4 @@
+import time
 from decimal import *
 
 
@@ -16,13 +17,17 @@ class Loan(object):
         # self.initial_guess = (self.beginning_value / self.periods) * (1 + self.interest_rate) * 1.5
         self.min_payment = (beginning_value - future_value) / periods
         self.max_payment = beginning_value * ((1 + interest_rate) ** periods)
+        self.recent_max = 0.0
+        self.iterations = 0
         self.payment_history = []
 
     def pmt(self):
-
+        ''' main api call to solve for a payment '''
         print ("Period\tBeginning Value\t\tInterest\tPayment\t\tEnding")
         values = self.set_initial_values()
-        self.solve(values)
+        solved_payment = self.solve(values)
+        print ("Total iterations: %s" % (self.iterations))
+        return solved_payment
 
     def set_initial_values(self, payment=None):
         if not payment:
@@ -37,6 +42,7 @@ class Loan(object):
         return values
 
     def solve(self, starting_values):
+        self.iterations = self.iterations + 1
         this_pmt = starting_values[2]
         self.payment_history.append(this_pmt)
         loan_schedule = [starting_values]
@@ -47,22 +53,22 @@ class Loan(object):
 
         if len(loan_schedule) == self.periods:
             print ("Periods correct")
-        
-        if loan_schedule[self.periods-1][3] < 1 and loan_schedule[self.periods-1][3] > -1:
-            print ("Solution found! Periodic Payment: %s" % (loan_schedule[2]))
-        else:
-            if loan_schedule[self.periods-1][3] < 1:
+
+        if loan_schedule[self.periods-1][3] > 0.04 or loan_schedule[self.periods-1][3] < -0.04:
+            if loan_schedule[self.periods-1][3] < 0.04:
                 ''' ending balance negative, pmt lower '''
-                # next_pmt = max(self.min_payment, this_pmt / 2)
+                self.recent_max = this_pmt ## can use this as anchor
                 next_pmt = (this_pmt + self.min_payment) / 2
                 values = self.set_initial_values(next_pmt)
                 self.solve(values)
-            else:
+            elif loan_schedule[self.periods-1][3] > -0.04:
                 ''' ending balance positive, pmt higher '''
-                next_pmt = (this_pmt + self.payment_history[-2]) / 2
+                next_pmt = (this_pmt + self.recent_max) / 2
                 values = self.set_initial_values(next_pmt)
                 self.solve(values)
-
+        else:
+            print ("Solution found! Periodic Payment: %s" % (this_pmt))
+            return this_pmt
 
     def next_period(self, period, period_values):
         beginning_value = Decimal(period_values[0]).quantize(Decimal('.01'), rounding=ROUND_UP)
@@ -82,5 +88,8 @@ class Loan(object):
 
 if __name__ == "__main__":
 
-    new_loan = Loan(100000,0,0.06,10)
+    start = time.time()
+    new_loan = Loan(100000,0,0.08,10)
     new_loan.pmt()
+    stop = time.time() - start
+    print(stop)
