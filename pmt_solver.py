@@ -53,7 +53,8 @@ class Loan(object):
         else:
             if loan_schedule[self.periods-1][3] < 1:
                 ''' ending balance negative, pmt lower '''
-                next_pmt = max(self.min_payment, this_pmt / 2)
+                # next_pmt = max(self.min_payment, this_pmt / 2)
+                next_pmt = (this_pmt + self.min_payment) / 2
                 values = self.set_initial_values(next_pmt)
                 self.solve(values)
             else:
