@@ -48,7 +48,7 @@ class Loan(object):
         ''' main api call to solve for a payment '''
         values = self.set_initial_values()
         self.solve(values)
-        print ("Payment: %s\tTotal iterations: %s" % (self.solved_payment, self.iterations))
+        # print ("Payment: %s\tTotal iterations: %s" % (self.solved_payment, self.iterations))
         return self.solved_payment
 
     def set_initial_values(self, payment=None):
@@ -84,7 +84,7 @@ class Loan(object):
                 self.solve(values)
         else:
             solved_payment = Decimal(this_payment).quantize(Decimal('.01'), rounding=ROUND_UP)
-            print ("Solution found! Periodic Payment: %s" % (solved_payment))
+            # print ("Solution found! Periodic Payment: %s" % (solved_payment))
             self.solved_payment = float(solved_payment)
             return solved_payment
 
@@ -110,16 +110,19 @@ if __name__ == "__main__":
 
     loan_book = []
     times = {}
-
     loan_book.append(Loan(100000,0,0.08,"years",25))
     loan_book.append(Loan(100000,0,0.08,"months",25*12))
     loan_book.append(Loan(100000,0,0.08,"weeks",25*52))
     loan_book.append(Loan(100000,0,0.08,"days",25*365))
     
     for loan in loan_book:
-        start = time.time()
-        pmt = loan.pmt()
-        runtime = time.time() - start
+        total_time = 0
+        for run in range(0,20):
+            start = time.time()
+            pmt = loan.pmt()
+            runtime = time.time() - start
+            total_time = total_time + runtime
+        runtime = total_time / ((run + 1) * 1.0)
         pmt_info = {}
         pmt_info["payment"] = pmt
         pmt_info["runtime"] = runtime
