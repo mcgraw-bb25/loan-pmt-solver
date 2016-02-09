@@ -11,7 +11,6 @@ class LoanError(Exception):
         return __repr__(self.message)
 
 
-
 class Loan(object):
     ''' 
     small class to compute solution to PMT on Loan
@@ -35,6 +34,7 @@ class Loan(object):
         self.beginning_value = beginning_value
         if payment_frequency in self.frequencies:
             self.interest_rate = interest_rate / self.frequencies[payment_frequency]
+            self.payment_frequency = payment_frequency
         else:
             raise LoanError("Incorrect payment frequency!")
         self.periods = periods
@@ -97,7 +97,6 @@ class Loan(object):
         # print ("%s\t%s\t\t\t%s\t\t%s\t\t%s" % (period+1, beginning_value, interest_paid,
         #                                    payment, ending_value))
 
-
         next_period = [
             period_values[3],
             period_values[3] * self.interest_rate,
@@ -109,8 +108,21 @@ class Loan(object):
 
 if __name__ == "__main__":
 
-    start = time.time()
-    new_loan = Loan(100000,0,0.08,"years",25)
-    a = new_loan.pmt()
-    stop = time.time() - start
-    print(stop)
+    loan_book = []
+    times = {}
+
+    loan_book.append(Loan(100000,0,0.08,"years",25))
+    loan_book.append(Loan(100000,0,0.08,"months",25*12))
+    loan_book.append(Loan(100000,0,0.08,"weeks",25*52))
+    loan_book.append(Loan(100000,0,0.08,"days",25*365))
+    
+    for loan in loan_book:
+        start = time.time()
+        pmt = loan.pmt()
+        runtime = time.time() - start
+        pmt_info = {}
+        pmt_info["payment"] = pmt
+        pmt_info["runtime"] = runtime
+        times[loan.payment_frequency] = pmt_info
+
+    print (times)
