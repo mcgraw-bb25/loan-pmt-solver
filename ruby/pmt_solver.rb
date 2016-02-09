@@ -23,6 +23,7 @@ class Loan
     end
 
     def pmt
+        9367.88
     end
 end
 

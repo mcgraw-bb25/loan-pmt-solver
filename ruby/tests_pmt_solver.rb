@@ -1,9 +1,14 @@
 require "minitest/autorun"
-# requite "pmt_solver"
+require_relative "pmt_solver"
 
 class TestPaymentSolver < MiniTest::Unit::TestCase
     def setup
-        @loan = Loan.new(100000,0,0.08,"years",25)
+        values = {  "beginning_value": 100000,
+                    "future_value": 0,
+                    "interest_rate": 0.08,
+                    "payment_frequency": "years",
+                    "periods": 25}
+        @loan = Loan.new(values)
     end
 
     def test_loan_one
@@ -11,3 +16,4 @@ class TestPaymentSolver < MiniTest::Unit::TestCase
     end
 
 end
+
