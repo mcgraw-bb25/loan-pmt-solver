@@ -3,7 +3,7 @@ from decimal import *
 
 
 class LoanError(Exception):
-    
+    ''' Class to allow throwing an error for loan initialization '''
     def __init__(self, message):
         self.message = message
 
@@ -12,7 +12,7 @@ class LoanError(Exception):
 
 
 class Loan(object):
-    ''' 
+    '''
     small class to compute solution to PMT on Loan
     construct new Loan giving:
         beginning_value > $0.00,
@@ -25,12 +25,15 @@ class Loan(object):
         payment_frequency = ["years","months","weeks","days"]
         periods > 0, (enter number of periods)
     '''
+
     frequencies = {"years": 1, "months": 12, "weeks": 52, "days": 365}
-    def __init__(self, beginning_value,
-                       future_value,
-                       interest_rate,
-                       payment_frequency,
-                       periods):
+
+    def __init__(self,
+                 beginning_value,
+                 future_value,
+                 interest_rate,
+                 payment_frequency,
+                 periods):
         self.beginning_value = beginning_value
         if payment_frequency in self.frequencies:
             self.interest_rate = interest_rate / self.frequencies[payment_frequency]
@@ -48,7 +51,6 @@ class Loan(object):
         ''' main api call to solve for a payment '''
         values = self.set_initial_values()
         self.solve(values)
-        # print ("Payment: %s\tTotal iterations: %s" % (self.solved_payment, self.iterations))
         return self.solved_payment
 
     def set_initial_values(self, payment=None):
@@ -67,8 +69,8 @@ class Loan(object):
         this_payment = starting_values[2]
         loan_schedule = [starting_values]
 
-        for i in range(0,self.periods):
-            loan_schedule.append(self.next_period(i, loan_schedule[i]))
+        for i in range(0, self.periods):
+            loan_schedule.append(self.next_period(loan_schedule[i]))
 
         if loan_schedule[self.periods-1][3] > 0.04 or loan_schedule[self.periods-1][3] < -0.04:
             if loan_schedule[self.periods-1][3] < 0.04:
@@ -84,11 +86,11 @@ class Loan(object):
                 self.solve(values)
         else:
             solved_payment = Decimal(this_payment).quantize(Decimal('.01'), rounding=ROUND_UP)
-            # print ("Solution found! Periodic Payment: %s" % (solved_payment))
             self.solved_payment = float(solved_payment)
             return solved_payment
 
-    def next_period(self, period, period_values):
+    def next_period(self, period_values):
+        ''' solves for the next period in a amortization schedule '''
         # beginning_value = Decimal(period_values[0]).quantize(Decimal('.01'), rounding=ROUND_UP)
         # interest_paid = Decimal(period_values[1]).quantize(Decimal('.01'), rounding=ROUND_UP)
         # payment = Decimal(period_values[2]).quantize(Decimal('.01'), rounding=ROUND_UP)
@@ -110,14 +112,14 @@ if __name__ == "__main__":
 
     loan_book = []
     times = {}
-    loan_book.append(Loan(100000,0,0.08,"years",25))
-    loan_book.append(Loan(100000,0,0.08,"months",25*12))
-    loan_book.append(Loan(100000,0,0.08,"weeks",25*52))
-    loan_book.append(Loan(100000,0,0.08,"days",25*365))
-    
+    loan_book.append(Loan(100000, 0, 0.08, "years", 25))
+    loan_book.append(Loan(100000, 0, 0.08, "months", 25*12))
+    loan_book.append(Loan(100000, 0, 0.08, "weeks", 25*52))
+    loan_book.append(Loan(100000, 0, 0.08, "days", 25*365))
+
     for loan in loan_book:
         total_time = 0
-        for run in range(0,20):
+        for run in range(0, 20):
             start = time.time()
             pmt = loan.pmt()
             runtime = time.time() - start
