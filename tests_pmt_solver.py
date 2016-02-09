@@ -4,20 +4,28 @@ from pmt_solver import Loan
 class TestPaymentSolver(unittest.TestCase):
 
     def test001(self):
-        test_loan = Loan(100000,0,0.08,10)
+        ''' years '''
+        test_loan = Loan(100000,0,0.08,"years",25)
         test_pmt = test_loan.pmt()
-        self.assertEqual(test_pmt, 14902.95)
+        self.assertEqual(test_pmt, 9367.88)
     
     def test002(self):
-        test_loan = Loan(100000,0,0.07,10)
+        ''' months '''
+        test_loan = Loan(100000,0,0.08,"months",25*12)
         test_pmt = test_loan.pmt()
-        self.assertEqual(test_pmt, 14237.75)
+        self.assertEqual(test_pmt, 771.82)
     
     def test003(self):
-        test_loan = Loan(100000,0,0.06,10)
+        ''' weeks '''
+        test_loan = Loan(100000,0,0.08,"weeks",25*52)
         test_pmt = test_loan.pmt()
-        self.assertEqual(test_pmt, 13586.80)
+        self.assertEqual(test_pmt, 177.97)
 
+    def test004(self):
+        ''' days '''
+        test_loan = Loan(100000,0,0.08,"days",25*365)
+        test_pmt = test_loan.pmt()
+        self.assertEqual(test_pmt, 25.35)
 
 if __name__ == "__main__":
     unittest.main()
