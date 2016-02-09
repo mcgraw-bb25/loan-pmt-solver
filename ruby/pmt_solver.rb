@@ -135,8 +135,5 @@ if __FILE__ == $0
         pmt_info[:runtime] = runtime
         times[loan.payment_frequency] = pmt_info
     end
-
-    puts times
-        
+    puts times     
 end
-
