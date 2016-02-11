@@ -49,6 +49,16 @@ public class LoanTest extends UnitTestHarness {
         } // end test
 
         testController.printTestResults(testController.getClass().getSimpleName());
+
+        if (testController.getScore() == 1.00) {
+            System.out.println("Nice work! The test score is 1.00!");
+            System.exit(0);
+        } else {
+            System.out.println("Aww shucks. There were some failures.");
+            System.exit(1);
+        }
+        // return 42;
+
     }
 
 };
